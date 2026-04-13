@@ -15,26 +15,34 @@ const allowedOrigins = [
 ];
 
 // 🔹 CORS FIX (production + login route support)
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow tools like Postman
-      if (!origin) return callback(null, true);
+const cors = require("cors");
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://your-vercel-app.vercel.app" // replace with actual frontend URL
+];
 
-      console.log("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow Postman / server-to-server
+    if (!origin) return callback(null, true);
 
-// Preflight requests
-app.options("*", cors());
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
+    console.log("❌ Blocked by CORS:", origin);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+
+// IMPORTANT: use SAME options here
+app.options("*", cors(corsOptions));
 // Middleware
 app.use(express.json());
 
