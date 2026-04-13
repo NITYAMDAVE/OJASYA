@@ -3,28 +3,23 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// DB Connection
+// DB connection
 require('./config/db');
 
 const app = express();
 
-// 🔹 Allowed Origins (UPDATED WITH YOUR VERCEL URL)
+/* =========================
+   CORS CONFIG (FIXED)
+========================= */
+
 const allowedOrigins = [
   "http://localhost:3000",
   "https://ojasya-fa8v-2knzc1jgc-nityamdaves-projects.vercel.app"
 ];
 
-// 🔹 CORS FIX (production + login route support)
-const cors = require("cors");
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://your-vercel-app.vercel.app" // replace with actual frontend URL
-];
-
 const corsOptions = {
   origin: function (origin, callback) {
-    // allow Postman / server-to-server
+    // allow tools like Postman
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
@@ -36,23 +31,32 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 };
 
+// Apply CORS FIRST
 app.use(cors(corsOptions));
-
-// IMPORTANT: use SAME options here
 app.options("*", cors(corsOptions));
-// Middleware
+
+/* =========================
+   MIDDLEWARE
+========================= */
+
 app.use(express.json());
 
-// Routes
+/* =========================
+   ROUTES
+========================= */
+
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/patients', require('./routes/patients'));
 app.use('/api', require('./routes/clinical'));
 app.use('/api', require('./routes/main'));
 
-// Health Check
+/* =========================
+   HEALTH CHECK
+========================= */
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -61,17 +65,26 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Root
+/* =========================
+   ROOT
+========================= */
+
 app.get('/', (req, res) => {
   res.send('🚀 Ojasya Backend is Live');
 });
 
-// 404
+/* =========================
+   404 HANDLER
+========================= */
+
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Error Handler
+/* =========================
+   ERROR HANDLER
+========================= */
+
 app.use((err, req, res, next) => {
   console.error('❌ ERROR:', err.message);
 
@@ -81,10 +94,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
+/* =========================
+   START SERVER
+========================= */
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`🏥 Backend running on port ${PORT}`);
-  console.log(`🌍 Frontend allowed: https://ojasya-fa8v-2knzc1jgc-nityamdaves-projects.vercel.app`);
+  console.log(`🌍 Allowed Frontend: ${allowedOrigins}`);
 });
