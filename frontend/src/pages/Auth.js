@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-const API = process.env.REACT_APP_API_URL;
+const API = process.env.REACT_APP_API_URL || "https://ojasya.onrender.com";
 const ROLES = [
   { key: 'patient', label: 'Patient' },
   { key: 'doctor', label: 'Doctor' },
@@ -23,7 +23,7 @@ export function LoginPage() {
     e.preventDefault();
     setError(''); setLoading(true);
     try {
-      const res = await axios.post('/api/auth/login', { ...form, role });
+      const res = await axios.post(`${API}/api/auth/login`, { ...form, role });
       login(res.data.user, res.data.token);
       navigate('/dashboard');
     } catch (err) {
@@ -98,7 +98,7 @@ export function SignupPage() {
     e.preventDefault();
     setError(''); setLoading(true);
     try {
-      const res = await axios.post('/api/auth/register', { ...form, role });
+      const res = await axios.post(`${API}/api/auth/register`, { ...form, role });
       login(res.data.user, res.data.token);
       navigate('/dashboard');
     } catch (err) {
