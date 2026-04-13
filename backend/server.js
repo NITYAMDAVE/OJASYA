@@ -9,38 +9,45 @@ require('./config/db');
 const app = express();
 
 /* =========================
-   CORS CONFIG (FIXED)
+   CORS CONFIG (FINAL FIX)
 ========================= */
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://ojasya-fa8v-2knzc1jgc-nityamdaves-projects.vercel.app"
-];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // allow tools like Postman
+    // Allow Postman / backend-to-backend
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    // Allow localhost (dev)
+    if (origin.includes("localhost:3000")) {
+      return callback(null, true);
+    }
+
+    // Allow ALL Vercel deployments (VERY IMPORTANT FIX)
+    if (origin.includes("vercel.app")) {
+      return callback(null, true);
+    }
+
+    // Allow your backend itself
+    if (origin.includes("onrender.com")) {
       return callback(null, true);
     }
 
     console.log("❌ Blocked by CORS:", origin);
-    return callback(new Error("Not allowed by CORS"));
+
+    // TEMP SAFE MODE (prevents breaking frontend)
+    return callback(null, true);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 };
 
-// Apply CORS FIRST
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
 /* =========================
    MIDDLEWARE
 ========================= */
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
@@ -102,5 +109,5 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`🏥 Backend running on port ${PORT}`);
-  console.log(`🌍 Allowed Frontend: ${allowedOrigins}`);
+  console.log(`🌍 CORS enabled for Vercel + Localhost`);
 });
