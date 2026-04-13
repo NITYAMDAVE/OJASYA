@@ -10,10 +10,13 @@ const app = express();
 
 // 🔹 CORS Configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    "http://localhost:3000",
+    "https://ojasya.onrender.com",
+    "https://ojasya-j3t6-4nyni21c9-nityamdaves-projects.vercel.app"
+  ],
   credentials: true
 }));
-
 // 🔹 Middleware
 app.use(express.json());
 
