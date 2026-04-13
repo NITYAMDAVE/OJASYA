@@ -230,4 +230,4 @@ export function SignupPage() {
       </div>
     </div>
   );
-} this is auth.js
+} 
